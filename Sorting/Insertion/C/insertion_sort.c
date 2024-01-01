@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 // A sequence of n numbers <a_1, a_2, ... , a_n>
 // Output A permutation (reordering) <a'_1, a'_2, ... , a'_n> such that a'_1 <= a'_2 <= ... <= a'_n.
@@ -32,26 +33,58 @@ void printArray(int arr[], int n){
 }
 
 // Test
-int main() {
-    int arr[] = {12, 11, 13, 5, 6};
-    int n = sizeof(arr) / sizeof(arr[0]);
+int main(int argc, char* argv[]) {
+		if (argc < 3){
+				printf("Usage: %s <array_size> <print_arrays>\n", argv[0]);
+        printf("       <print_arrays> - 0 for no, 1 for yes\n");
+				return 1;
+		}
 
-    printf("Initial array: ");
-    printArray(arr, n);
-    
-    clock_t start, end;
-    double cpu_time_used;
+		int n = atoi(argv[1]); // Convert argument to integer
+    int print_arrays = atoi(argv[2]); // Convert print flag to integer
 
-    start = clock();
-    insertionSort(arr, n);
-    end = clock();
+		if (n <= 0) {
+			 printf("Please enter a positive integer for the array size.\n");
+			 return 1;
+		}
 
-    printf("Sorted array: ");
-    printArray(arr, n);
-    
-    // CLOCKS_PER_SEC is a macro from <time.h>
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("The algorithm took %f seconds to execute\n", cpu_time_used);
+		// Seed the random number generator
+		srand(time(NULL));
 
-    return 0;
+		// Dynamically allocate memory for the array
+		int* arr = malloc(n * sizeof(int));
+		if(arr == NULL){
+			perror("Memory allocation failed");
+			return 1;
+		}
+
+		// Fill the array with random numbers
+		for (int i = 0; i<n; i++){
+			arr[i] = rand() % 1000;
+		}
+
+		if (print_arrays) {
+        printf("Initial array: ");
+        printArray(arr, n);
+    }
+		
+		clock_t start, end;
+		double cpu_time_used;
+
+		start = clock();
+		insertionSort(arr, n);
+		end = clock();
+
+		if (print_arrays) {
+        printf("Sorted array: ");
+        printArray(arr, n);
+    }
+		
+		// CLOCKS_PER_SEC is a macro from <time.h>
+		cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+		printf("The algorithm took %f seconds to execute\n", cpu_time_used);
+
+		// Clean up
+		free(arr);
+		return 0;
 }
